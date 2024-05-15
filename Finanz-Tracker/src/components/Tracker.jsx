@@ -140,9 +140,9 @@ const Tracker = () => {
           <li key={index}>
             {transaction.description}: {transaction.amount} €
             {/* Button zum Löschen einer Transaktion */}
-            <button onClick={() => deleteTransaction(index)}>🗑️</button>
+            <button className="delete" onClick={() => deleteTransaction(index)}>🗑️</button>
             {/* Button zum Öffnen des Modals zur Bearbeitung */}
-            <button onClick={() => openEditModal(index)}>✏️</button>
+            <button className="delete" onClick={() => openEditModal(index)}>✏️</button>
           </li>
         ))}
       </ul>
