@@ -1,0 +1,22 @@
+.delete {
+    color: red;
+    cursor: pointer;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  .track {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  input {
+    margin: 5px;
+    width: 200px;
+  }

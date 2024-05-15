@@ -22,3 +22,10 @@ button {
 h1, h2 {
   color: #ccbaba;
 }
+
+
+
+.delete {
+  color: red;
+  cursor: pointer;
+}
