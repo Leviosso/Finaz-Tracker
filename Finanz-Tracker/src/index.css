@@ -46,6 +46,12 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+.delete {
+  color: red;
+  cursor: pointer;
+
+}
 button:hover {
   border-color: #646cff;
 }
