@@ -1,8 +1,18 @@
+
+
+import Tracker from "./components/Tracker";
+
 import React, { useState, useEffect } from "react";
+
 import "./App.css";
 
 //Die App-Komponente wird in eine eigene Datei ausgelagert
 const App = () => {
+
+  return (
+    <div>
+      <Tracker />
+
   const [transactions, setTransactions] = useState([]);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
@@ -79,6 +89,7 @@ const App = () => {
         ))}
       </ul>
       <h3>Gesamtausgaben: {getTotalAmount()} €</h3>
+
     </div>
   );
 }
