@@ -1,5 +1,4 @@
 import Tracker from "./components/Tracker";
-import React, { useState, useEffect } from "react";
 
 import "./App.css";
 
