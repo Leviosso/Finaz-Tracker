@@ -1,38 +1,69 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { addTransaction } from './store';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addTransaction, setTransactions } from "./store";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4563', '#C71585', '#8A2BE2', '#A52A2A'];
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#FF4563",
+  "#C71585",
+  "#8A2BE2",
+  "#A52A2A",
+];
 
 const Tracker = () => {
   const transactions = useSelector((state) => state.transactions.transactions);
   const dispatch = useDispatch();
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [filter, setFilter] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
+  const [type, setType] = useState("expense");
+  const [filter, setFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  useEffect(() => {
+    const savedTransactions =
+      JSON.parse(localStorage.getItem("transactions")) || [];
+    dispatch(setTransactions(savedTransactions));
+  }, [dispatch]);
+
+  useEffect(() => {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }, [transactions]);
 
   const handleAddTransaction = () => {
     if (description && amount) {
-      dispatch(addTransaction({ description, amount: parseFloat(amount) }));
-      setDescription('');
-      setAmount('');
+      dispatch(
+        addTransaction({ description, amount: parseFloat(amount), type })
+      );
+      setDescription("");
+      setAmount("");
+      setType("expense"); // Reset to default type
     }
   };
 
   const getTotalAmount = () => {
-    return transactions.reduce((total, transaction) => total + transaction.amount, 0);
+    return transactions.reduce((total, transaction) => {
+      return transaction.type === "income"
+        ? total + transaction.amount
+        : total - transaction.amount;
+    }, 0);
   };
 
   const filteredTransactions = transactions
-    .filter(transaction => transaction.description.toLowerCase().includes(filter.toLowerCase()))
-    .sort((a, b) => sortOrder === 'asc' ? a.amount - b.amount : b.amount - a.amount);
+    .filter((transaction) =>
+      transaction.description.toLowerCase().includes(filter.toLowerCase())
+    )
+    .sort((a, b) =>
+      sortOrder === "asc" ? a.amount - b.amount : b.amount - a.amount
+    );
 
   const dataForPieChart = transactions.map((transaction, index) => ({
     name: transaction.description,
     value: transaction.amount,
-    color: COLORS[index % COLORS.length]
+    color: COLORS[index % COLORS.length],
   }));
 
   return (
@@ -50,6 +81,10 @@ const Tracker = () => {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
+      <select value={type} onChange={(e) => setType(e.target.value)}>
+        <option value="expense">Ausgabe</option>
+        <option value="income">Einnahme</option>
+      </select>
       <button onClick={handleAddTransaction}>Hinzufügen</button>
       <input
         type="text"
@@ -57,30 +92,35 @@ const Tracker = () => {
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
       />
-      <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
-        Sortieren ({sortOrder === 'asc' ? 'Aufsteigend' : 'Absteigend'})
+      <button
+        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+      >
+        Sortieren ({sortOrder === "asc" ? "Aufsteigend" : "Absteigend"})
       </button>
       <h2>Transaktionen</h2>
       <ul>
         {filteredTransactions.map((transaction, index) => (
           <li key={index}>
-            {transaction.description}: {transaction.amount} €
+            {transaction.description}: {transaction.amount} € (
+            {transaction.type === "income" ? "Einnahme" : "Ausgabe"})
           </li>
         ))}
       </ul>
-      <h3>Gesamtausgaben: {getTotalAmount()} €</h3>
+      <h3>Gesamtsaldo: {getTotalAmount()} €</h3>
       <h2>Verteilung der Ausgaben</h2>
-      <PieChart width={400} height={400}>
+      <PieChart width={500} height={500}>
         <Pie
           data={dataForPieChart}
-          cx={200}
+          cx={250}
           cy={200}
           innerRadius={50}
           outerRadius={100}
           fill="#8884d8"
           paddingAngle={5}
           dataKey="value"
-          label={({ name, value }) => `${name}: ${value}€`}
+          label={({ name, percent }) =>
+            `${name}: ${(percent * 100).toFixed(0)}%`
+          }
           labelLine={true}
         >
           {dataForPieChart.map((entry, index) => (
@@ -95,5 +135,3 @@ const Tracker = () => {
 };
 
 export default Tracker;
-
-
