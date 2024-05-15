@@ -9,7 +9,7 @@ const App = () => {
   const [filter, setFilter] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
 
-  //Die Funktionen useEffect werden in eine eigene Funktion ausgelagert
+  //Die Funktionen useEffect werden in eine eigene Funktion ausgelagert 
   useEffect(() => {
     const savedTransactions =
       JSON.parse(localStorage.getItem("transactions")) || [];
