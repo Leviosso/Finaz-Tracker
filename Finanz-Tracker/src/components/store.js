@@ -9,10 +9,13 @@ const transactionsSlice = createSlice({
     addTransaction: (state, action) => {
       state.transactions.push(action.payload);
     },
+    setTransactions: (state, action) => {
+      state.transactions = action.payload;
+    },
   },
 });
 
-export const { addTransaction } = transactionsSlice.actions;
+export const { addTransaction, setTransactions } = transactionsSlice.actions;
 
 const store = configureStore({
   reducer: {
@@ -21,3 +24,5 @@ const store = configureStore({
 });
 
 export default store;
+
+
