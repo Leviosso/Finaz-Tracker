@@ -1,51 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addTransaction } from './store';
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4563', '#C71585', '#8A2BE2', '#A52A2A'];
 
 const Tracker = () => {
+  const transactions = useSelector((state) => state.transactions.transactions);
+  const dispatch = useDispatch();
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [filter, setFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
 
-  const [transactions, setTransactions] = useState([]);
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [filter, setFilter] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
-
-  //Die Funktionen useEffect werden in eine eigene Funktion ausgelagert 
-  useEffect(() => {
-    const savedTransactions =
-      JSON.parse(localStorage.getItem("transactions")) || [];
-    setTransactions(savedTransactions);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-  }, [transactions]);
-
-  //Die Funktion addTransaction wird in eine eigene Funktion ausgelagert
-  const addTransaction = () => {
+  const handleAddTransaction = () => {
     if (description && amount) {
-      setTransactions([
-        ...transactions,
-        { description, amount: parseFloat(amount) },
-      ]);
-      setDescription("");
-      setAmount("");
+      dispatch(addTransaction({ description, amount: parseFloat(amount) }));
+      setDescription('');
+      setAmount('');
     }
   };
 
-//Die Berechnung der Gesamtsumme wird in eine eigene Funktion ausgelagert
-const getTotalAmount = () => {
-  return transactions.reduce(
-    (total, transaction) => total + transaction.amount,
-    0
-  );
-};
+  const getTotalAmount = () => {
+    return transactions.reduce((total, transaction) => total + transaction.amount, 0);
+  };
 
-  //Die Filterung und Sortierung der Transaktionen wird in eine eigene Funktion ausgelagert
   const filteredTransactions = transactions
-  .filter(transaction => transaction.description.toLowerCase().includes(filter.toLowerCase()))
-  .sort((a, b) => sortOrder === 'asc' ? a.amount - b.amount : b.amount - a.amount);
+    .filter(transaction => transaction.description.toLowerCase().includes(filter.toLowerCase()))
+    .sort((a, b) => sortOrder === 'asc' ? a.amount - b.amount : b.amount - a.amount);
+
+  const dataForPieChart = transactions.map((transaction, index) => ({
+    name: transaction.description,
+    value: transaction.amount,
+    color: COLORS[index % COLORS.length]
+  }));
 
   return (
-    <>
+    <div>
       <h1>Finanz-Tracker</h1>
       <input
         type="text"
@@ -59,7 +50,7 @@ const getTotalAmount = () => {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
       />
-      <button onClick={addTransaction}>Hinzufügen</button>
+      <button onClick={handleAddTransaction}>Hinzufügen</button>
       <input
         type="text"
         placeholder="Filter"
@@ -69,18 +60,40 @@ const getTotalAmount = () => {
       <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
         Sortieren ({sortOrder === 'asc' ? 'Aufsteigend' : 'Absteigend'})
       </button>
-
       <h2>Transaktionen</h2>
       <ul>
-        {transactions.map((transaction, index) => (
+        {filteredTransactions.map((transaction, index) => (
           <li key={index}>
-            {transaction.description}: {transaction.amount}
+            {transaction.description}: {transaction.amount} €
           </li>
         ))}
       </ul>
-
       <h3>Gesamtausgaben: {getTotalAmount()} €</h3>
-    </>
+      <h2>Verteilung der Ausgaben</h2>
+      <PieChart width={400} height={400}>
+        <Pie
+          data={dataForPieChart}
+          cx={200}
+          cy={200}
+          innerRadius={50}
+          outerRadius={100}
+          fill="#8884d8"
+          paddingAngle={5}
+          dataKey="value"
+          label={({ name, value }) => `${name}: ${value}€`}
+          labelLine={true}
+        >
+          {dataForPieChart.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </div>
   );
 };
+
 export default Tracker;
+
+
