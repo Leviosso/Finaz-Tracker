@@ -106,9 +106,9 @@ const Tracker = () => {
             {transaction.type === "income" ? "Einnahme" : "Ausgabe"})
             {transaction.description}: {transaction.amount} €
             {/* Button zum Löschen einer Transaktion */}
-            <button className="delete" onClick={() => deleteTransaction(index)}>🗑️</button>
+            <button onClick={() => deleteTransaction(index)}>🗑️</button>
             {/* Button zum Öffnen des Modals zur Bearbeitung */}
-            <button className="delete" onClick={() => openEditModal(index)}>✏️</button>
+            <button onClick={() => openEditModal(index)}>✏️</button>
           </li>
         ))}
       </ul>
@@ -162,7 +162,7 @@ const Tracker = () => {
       )}
 
       {/* Anzeige der Gesamtsumme */}
-      <h3>Gesamtsumme: {getTotalAmount()} €</h3>
+      <h3>Gesamtausgaben: {getTotalAmount()} €</h3>
       </div>
     </>
   );
