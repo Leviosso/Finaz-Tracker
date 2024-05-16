@@ -13,6 +13,10 @@ const COLORS = [
   "#C71585",
   "#8A2BE2",
   "#A52A2A",
+  "#7FFF00",
+  "#FFD700",
+  "#FF8C00",
+  "#FF1493",
 ];
 
 const categories = [
@@ -25,6 +29,12 @@ const categories = [
   { icon: "🛍️", name: "Kleidung" },
   { icon: "💶", name: "Gehalt" },
   { icon: "📈", name: "Zinsen" },
+  { icon: "🎁", name: "Geschenke" },
+  { icon: "📚", name: "Bildung" },
+  { icon: "🏥", name: "Gesundheit" },
+  { icon: "📱", name: "Telefon" },
+  { icon: "🎫", name: "Tickets" },
+  { icon: "🚁", name: "Flug" },
   { icon: "📦", name: "Sonstiges" },
 ];
 
@@ -38,7 +48,8 @@ const Tracker = () => {
   const [date, setDate] = useState("");
   const [filter, setFilter] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [selectedTransactionIndex, setSelectedTransactionIndex] = useState(null);
+  const [selectedTransactionIndex, setSelectedTransactionIndex] =
+    useState(null);
   const [editDescription, setEditDescription] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editCategory, setEditCategory] = useState("");
@@ -46,7 +57,8 @@ const Tracker = () => {
   const [showCategories, setShowCategories] = useState(false);
 
   useEffect(() => {
-    const savedTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
+    const savedTransactions =
+      JSON.parse(localStorage.getItem("transactions")) || [];
     dispatch(setTransactions(savedTransactions));
   }, [dispatch]);
 
@@ -94,8 +106,10 @@ const Tracker = () => {
   };
 
   const filteredTransactions = transactions
-    .filter((transaction) =>
-      transaction.category && transaction.category.toLowerCase().includes(filter.toLowerCase())
+    .filter(
+      (transaction) =>
+        transaction.category &&
+        transaction.category.toLowerCase().includes(filter.toLowerCase())
     )
     .sort((a, b) =>
       sortOrder === "asc" ? a.amount - b.amount : b.amount - a.amount
@@ -138,8 +152,12 @@ const Tracker = () => {
     color: COLORS[index % COLORS.length],
   }));
 
-  const incomeTransactions = filteredTransactions.filter(transaction => transaction.type === "income");
-  const expenseTransactions = filteredTransactions.filter(transaction => transaction.type === "expense");
+  const incomeTransactions = filteredTransactions.filter(
+    (transaction) => transaction.type === "income"
+  );
+  const expenseTransactions = filteredTransactions.filter(
+    (transaction) => transaction.type === "expense"
+  );
 
   const totalIncome = getIncomeTotal();
   const totalExpenses = getExpenseTotal();
@@ -176,11 +194,17 @@ const Tracker = () => {
       {showCategories && (
         <div>
           {categories.map((cat, index) => (
-            <button key={index} title={`${cat.name}`} onClick={() => setCategory(cat.icon)}>{cat.icon}</button>
+            <button
+              key={index}
+              title={`${cat.name}`}
+              onClick={() => setCategory(cat.icon)}
+            >
+              {cat.icon}
+            </button>
           ))}
         </div>
       )}
-      
+
       <button onClick={handleAddTransaction}>Hinzufügen</button>
       <input
         type="text"
@@ -197,7 +221,9 @@ const Tracker = () => {
       <ul>
         {filteredTransactions.map((transaction, index) => (
           <li key={index}>
-            {transaction.date} - {transaction.category}: {transaction.description || "Keine Beschreibung"}: {transaction.amount} € (
+            {transaction.date} - {transaction.category}:{" "}
+            {transaction.description || "Keine Beschreibung"}:{" "}
+            {transaction.amount} € (
             {transaction.type === "income" ? "Einnahme" : "Ausgabe"})
             <button className="delete" onClick={() => deleteTransaction(index)}>
               🗑️
@@ -209,39 +235,41 @@ const Tracker = () => {
         ))}
       </ul>
       <div className="details">
-      <h3>Gesamtsaldo: {getTotalAmount()} €</h3>
-      <h3>Gesamteinnahmen: {totalIncome} €</h3>
-      <h3>Gesamtausgaben: {totalExpenses} €</h3>
-      <h3>Saldo (Einnahmen - Ausgaben): {balance} €</h3>
-      <h2>Verteilung der Ausgaben</h2>
-      <PieChart width={500} height={500}>
-        <Pie
-          data={dataForPieChart}
-          cx={250}
-          cy={200}
-          innerRadius={50}
-          outerRadius={100}
-          fill="#8884d8"
-          paddingAngle={5}
-          dataKey="value"
-          label={({ name, percent }) =>
-            `${name}: ${(percent * 100).toFixed(0)}%`
-          }
-          labelLine={true}
-        >
-          {dataForPieChart.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
+        <h3>Gesamtsaldo: {getTotalAmount()} €</h3>
+        <h3>Gesamteinnahmen: {totalIncome} €</h3>
+        <h3>Gesamtausgaben: {totalExpenses} €</h3>
+        <h3>Saldo (Einnahmen - Ausgaben): {balance} €</h3>
+        <h2>Verteilung der Ausgaben</h2>
+        <PieChart width={500} height={500}>
+          <Pie
+            data={dataForPieChart}
+            cx={250}
+            cy={210}
+            innerRadius={60}
+            outerRadius={120}
+            fill="#8884d8"
+            paddingAngle={10}
+            dataKey="value"
+            label={({ name, percent }) =>
+              `${name}: ${(percent * 100).toFixed(0)}%`
+            }
+            labelLine={true}
+          >
+            {dataForPieChart.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
       </div>
       <h2>Einnahmen</h2>
       <ul>
         {incomeTransactions.map((transaction, index) => (
           <li key={index}>
-            {transaction.date} - {transaction.category}: {transaction.description || "Keine Beschreibung"}: {transaction.amount} €
+            {transaction.date} - {transaction.category}:{" "}
+            {transaction.description || "Keine Beschreibung"}:{" "}
+            {transaction.amount} €
           </li>
         ))}
       </ul>
@@ -250,7 +278,9 @@ const Tracker = () => {
       <ul>
         {expenseTransactions.map((transaction, index) => (
           <li key={index}>
-            {transaction.date} - {transaction.category}: {transaction.description || "Keine Beschreibung"}: {transaction.amount} €
+            {transaction.date} - {transaction.category}:{" "}
+            {transaction.description || "Keine Beschreibung"}:{" "}
+            {transaction.amount} €
           </li>
         ))}
       </ul>
@@ -278,7 +308,9 @@ const Tracker = () => {
           />
           <div className="categories">
             {categories.map((cat, index) => (
-              <button key={index} onClick={() => setEditCategory(cat.icon)}>{cat.icon}</button>
+              <button key={index} onClick={() => setEditCategory(cat.icon)}>
+                {cat.icon}
+              </button>
             ))}
           </div>
           <button onClick={updateTransaction}>Speichern</button>
