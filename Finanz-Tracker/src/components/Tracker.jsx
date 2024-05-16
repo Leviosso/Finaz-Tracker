@@ -16,16 +16,16 @@ const COLORS = [
 ];
 
 const categories = [
-  "Auto",
-  "Gas",
-  "Strom",
-  "Miete",
-  "Essen",
-  "Unterhaltung",
-  "Kleidung",
-  "Gehalt",
-  "Zinsen",
-  "Sonstiges",
+  { icon: "🚗", name: "Auto" },
+  { icon: "🛢️", name: "Gas" },
+  { icon: "⚡", name: "Strom" },
+  { icon: "🏠", name: "Miete" },
+  { icon: "🍲", name: "Essen" },
+  { icon: "🎲", name: "Unterhaltung" },
+  { icon: "🛍️", name: "Kleidung" },
+  { icon: "💶", name: "Gehalt" },
+  { icon: "📈", name: "Zinsen" },
+  { icon: "📦", name: "Sonstiges" },
 ];
 
 const Tracker = () => {
@@ -43,6 +43,7 @@ const Tracker = () => {
   const [editAmount, setEditAmount] = useState("");
   const [editCategory, setEditCategory] = useState("");
   const [editDate, setEditDate] = useState("");
+  const [showCategories, setShowCategories] = useState(false);
 
   useEffect(() => {
     const savedTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
@@ -169,14 +170,17 @@ const Tracker = () => {
         <option value="expense">Ausgabe</option>
         <option value="income">Einnahme</option>
       </select>
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option value="">Kategorie auswählen</option>
-        {categories.map((cat) => (
-          <option key={cat} value={cat}>
-            {cat}
-          </option>
-        ))}
-      </select>
+      <button onClick={() => setShowCategories(!showCategories)}>
+        {showCategories ? "Kategorien ausblenden" : "Kategorien wählen"}
+      </button>
+      {showCategories && (
+        <div>
+          {categories.map((cat, index) => (
+            <button key={index} title={`${cat.name}`} onClick={() => setCategory(cat.icon)}>{cat.icon}</button>
+          ))}
+        </div>
+      )}
+      
       <button onClick={handleAddTransaction}>Hinzufügen</button>
       <input
         type="text"
@@ -204,6 +208,7 @@ const Tracker = () => {
           </li>
         ))}
       </ul>
+      <div className="details">
       <h3>Gesamtsaldo: {getTotalAmount()} €</h3>
       <h3>Gesamteinnahmen: {totalIncome} €</h3>
       <h3>Gesamtausgaben: {totalExpenses} €</h3>
@@ -231,7 +236,7 @@ const Tracker = () => {
         <Tooltip />
         <Legend />
       </PieChart>
-
+      </div>
       <h2>Einnahmen</h2>
       <ul>
         {incomeTransactions.map((transaction, index) => (
@@ -271,14 +276,11 @@ const Tracker = () => {
             value={editDate}
             onChange={(e) => setEditDate(e.target.value)}
           />
-          <select value={editCategory} onChange={(e) => setEditCategory(e.target.value)}>
-            <option value="">Kategorie auswählen</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
+          <div className="categories">
+            {categories.map((cat, index) => (
+              <button key={index} onClick={() => setEditCategory(cat.icon)}>{cat.icon}</button>
             ))}
-          </select>
+          </div>
           <button onClick={updateTransaction}>Speichern</button>
         </div>
       )}
