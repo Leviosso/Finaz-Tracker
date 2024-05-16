@@ -171,7 +171,7 @@ const Tracker = () => {
       )}
 
       {/* Anzeige der Gesamtsumme */}
-      <h3>Gesamtausgaben: {getTotalAmount()} €</h3>
+      <h3>Gesamtsumme: {getTotalAmount()} €</h3>
       </div>
     </>
   );
