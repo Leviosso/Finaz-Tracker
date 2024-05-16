@@ -67,6 +67,7 @@ const Tracker = () => {
   }));
 
   return (
+    <>
     <div>
       <h1>Finanz-Tracker</h1>
       <input
@@ -103,6 +104,11 @@ const Tracker = () => {
           <li key={index}>
             {transaction.description}: {transaction.amount} € (
             {transaction.type === "income" ? "Einnahme" : "Ausgabe"})
+            {transaction.description}: {transaction.amount} €
+            {/* Button zum Löschen einer Transaktion */}
+            <button onClick={() => deleteTransaction(index)}>🗑️</button>
+            {/* Button zum Öffnen des Modals zur Bearbeitung */}
+            <button onClick={() => openEditModal(index)}>✏️</button>
           </li>
         ))}
       </ul>
@@ -130,7 +136,35 @@ const Tracker = () => {
         <Tooltip />
         <Legend />
       </PieChart>
-    </div>
+    
+
+      {/* Modal für die Bearbeitung */}
+      {selectedTransactionIndex !== null && (
+        <div>
+          <h3>{editOption === "amount" ? "Betrag" : "Beschreibung"} bearbeiten</h3>
+          {/* Eingabefeld je nach ausgewählter Option */}
+          {editOption === "amount" ? (
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          ) : (
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          )}
+          {/* Button zum Speichern der Änderungen */}
+          <button onClick={updateTransaction}>💾</button>
+        </div>
+      )}
+
+      {/* Anzeige der Gesamtsumme */}
+      <h3>Gesamtausgaben: {getTotalAmount()} €</h3>
+      </div>
+    </>
   );
 };
 
