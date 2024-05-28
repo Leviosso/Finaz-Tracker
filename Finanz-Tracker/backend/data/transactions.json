@@ -1,0 +1,18 @@
+[
+  {
+    "id": "56779aa5-7933-46b5-b2f9-6f599cb09f2c",
+    "description": "Strom",
+    "amount": 150,
+    "type": "expense",
+    "category": "Strom",
+    "date": "2024-05-28"
+  },
+  {
+    "id": "56779aa5-7933-46b5-b2f9-6f599cb09f2c",
+    "description": "Strom",
+    "amount": 150,
+    "type": "expense",
+    "category": "Strom",
+    "date": "2024-05-28"
+  }
+]

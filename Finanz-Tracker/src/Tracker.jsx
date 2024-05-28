@@ -38,17 +38,34 @@ const Tracker = () => {
   const [editDate, setEditDate] = useState("");
 
   useEffect(() => {
-    const savedTransactions = JSON.parse(localStorage.getItem("transactions")) || [];
-    dispatch(setTransactions(savedTransactions));
+    const fetchTransactions = async () => {
+      const response = await fetch('http://localhost:5000/api/transactions');
+      if (response.ok) {
+        const data = await response.json();
+        dispatch(setTransactions(data));
+      } else {
+        console.error('Failed to fetch transactions');
+      }
+    };
+
+    fetchTransactions();
   }, [dispatch]);
 
-  useEffect(() => {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-  }, [transactions]);
+  const handleAddTransaction = async (transaction) => {
+    const response = await fetch('http://localhost:5000/api/transactions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transaction),
+    });
 
-  const handleAddTransaction = (transaction) => {
-    transaction.id = new Date().toISOString(); // Assign a unique ID based on the current timestamp
-    dispatch(addTransaction(transaction));
+    if (response.ok) {
+      const newTransaction = await response.json();
+      dispatch(addTransaction(newTransaction));
+    } else {
+      console.error('Failed to add transaction');
+    }
   };
 
   const getTotalAmount = () => {
@@ -81,9 +98,16 @@ const Tracker = () => {
       sortOrder === "asc" ? a.amount - b.amount : b.amount - a.amount
     );
 
-  const deleteTransaction = (id) => {
-    const updatedTransactions = transactions.filter((transaction) => transaction.id !== id);
-    dispatch(setTransactions(updatedTransactions));
+  const deleteTransaction = async (id) => {
+    const response = await fetch(`http://localhost:5000/api/transactions/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      dispatch(setTransactions(transactions.filter((transaction) => transaction.id !== id)));
+    } else {
+      console.error('Failed to delete transaction');
+    }
   };
 
   const openEditModal = (id) => {
@@ -97,18 +121,36 @@ const Tracker = () => {
     }
   };
 
-  const updateTransaction = () => {
-    const updatedTransactions = transactions.map((transaction) =>
-      transaction.id === selectedTransactionId
-        ? { ...transaction, description: editDescription, amount: parseFloat(editAmount), category: editCategory, date: editDate }
-        : transaction
-    );
-    dispatch(setTransactions(updatedTransactions));
-    setSelectedTransactionId(null);
-    setEditDescription("");
-    setEditAmount("");
-    setEditCategory("");
-    setEditDate("");
+  const updateTransaction = async () => {
+    const updatedTransaction = {
+      id: selectedTransactionId,
+      description: editDescription,
+      amount: parseFloat(editAmount),
+      category: editCategory,
+      date: editDate,
+      type: transactions.find(t => t.id === selectedTransactionId).type
+    };
+
+    const response = await fetch(`http://localhost:5000/api/transactions/${selectedTransactionId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedTransaction),
+    });
+
+    if (response.ok) {
+      dispatch(setTransactions(transactions.map((transaction) =>
+        transaction.id === selectedTransactionId ? updatedTransaction : transaction
+      )));
+      setSelectedTransactionId(null);
+      setEditDescription("");
+      setEditAmount("");
+      setEditCategory("");
+      setEditDate("");
+    } else {
+      console.error('Failed to update transaction');
+    }
   };
 
   const incomeTransactions = filteredTransactions.filter((transaction) => transaction.type === "income");
